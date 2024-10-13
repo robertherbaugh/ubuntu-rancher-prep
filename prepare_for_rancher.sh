@@ -15,22 +15,38 @@ sudo apt-get update -y || handle_error "Failed to update package list"
 echo "Upgrading installed packages..."
 sudo apt-get upgrade -y || handle_error "Failed to upgrade installed packages"
 
+# List of preliminary packages
+prelim_packages=(
+    ca-certificates
+    cloud-image-utils
+    cloud-initramfs-growroot
+    open-iscsi
+    openssh-server
+    open-vm-tools
+    apparmor-utils
+    cloud-init
+    cloud-guest-utils
+)
+
+# Install preliminary packages in a loop
+echo "Installing preliminary packages..."
+for package in "${prelim_packages[@]}"; do
+    sudo apt-get install -y "$package" || handle_error "Failed to install $package package"
+done
+
+# List of required packages
+required_packages=(
+    curl
+    wget
+    git
+    net-tools
+    unzip
+)
+
+# Install required packages in a loop
 echo "Installing required packages..."
-sudo apt-get install -y \
-    curl \
-    wget \
-    git \
-    net-tools \
-    unzip \
-    apparmor-utils \  # Updated from apparmor-parser
-    ca-certificates \
-    cloud-init \
-    cloud-guest-utils \  # Includes growpart
-    cloud-image-utils \
-    cloud-initramfs-growroot \
-    open-iscsi \
-    openssh-server \
-    open-vm-tools || handle_error "Failed to install required packages"
+sudo apt-get install -y "${required_packages[@]}" || handle_error "Failed to install required packages"
+
 
 # Disable swap and prevent it from being turned on
 echo "Disabling swap..."
